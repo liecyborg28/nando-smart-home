@@ -10,7 +10,7 @@ Setiap request ke `/mcp` **dan** `/api/*` (REST) melewati ini berurutan, lewat s
 |---|---|---|
 | 1 | Pembatas per IP (sebelum autentikasi) | Banjir request, tebak-tebak token |
 | 2 | Wajib HTTPS | Token terkirim polos lewat jaringan |
-| 3 | Allowlist Host/Origin | DNS rebinding dari browser |
+| 3 | Allowlist Host/Origin (Host opsional: kosong = tidak diperiksa) | DNS rebinding dari browser |
 | 4 | Autentikasi token (Postgres) | Akses tanpa izin; token dicabut berlaku |
 | 5 | Pembatas per token + batas konkurensi | Satu klien memonopoli server |
 | 6 | Scope per tool (`read` / `write`) | Token baca dipakai mengontrol |
@@ -49,8 +49,8 @@ NODE_ENV=production
 DATABASE_URL=...            # koneksi langsung (migrasi + CLI)
 DATABASE_URL_POOLED=...     # koneksi pooled (aplikasi)
 CONFIRMATION_SECRET=...     # acak, >= 32 karakter
-MCP_ALLOWED_HOSTS=home.contoh.com
-MCP_ALLOWED_ORIGINS=home.contoh.com
+MCP_ALLOWED_HOSTS=home.contoh.com   # opsional tapi disarankan; kosong = semua Host diterima
+MCP_ALLOWED_ORIGINS=home.contoh.com # hanya bila ada dashboard di browser
 TRUSTED_PROXY_HOPS=1        # jumlah reverse proxy di depan (Caddy/nginx/Cloudflare)
 CONFIRM_ALL_WRITES=true     # disarankan: setiap kontrol butuh konfirmasi
 WRITE_RATE_LIMIT_PER_MINUTE=10

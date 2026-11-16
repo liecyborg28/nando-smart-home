@@ -1,4 +1,4 @@
-import { getEnv, secretValues, type Env } from "@/config/env";
+import { allowedHosts, getEnv, secretValues, type Env } from "@/config/env";
 import { getPool } from "@/db/runtime";
 import { createLogger, type Logger } from "@/lib/logger";
 import { createAuditLog, type AuditLog } from "@/security/audit";
@@ -29,8 +29,10 @@ type Holder = { [KEY]?: HttpContext };
 const LOCAL_ONLY = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
 function warnAboutRiskyConfig(env: Env, log: Logger): void {
-  const hosts = env.MCP_ALLOWED_HOSTS.split(",").map((h) => h.trim()).filter(Boolean);
-  if (env.NODE_ENV === "production" && hosts.every((h) => LOCAL_ONLY.has(h))) {
+  const hosts = allowedHosts(env);
+  if (env.NODE_ENV === "production" && hosts.length === 0) {
+    log.warn("MCP_ALLOWED_HOSTS is not set: any Host header is accepted, so the token is the only gate. Set it to your hostname(s) for DNS-rebinding protection");
+  } else if (env.NODE_ENV === "production" && hosts.every((h) => LOCAL_ONLY.has(h))) {
     log.warn("MCP_ALLOWED_HOSTS only lists localhost: set your public hostname, otherwise remote clients are refused");
   }
   if (env.NODE_ENV === "production" && env.TRUSTED_PROXY_HOPS === 0) {

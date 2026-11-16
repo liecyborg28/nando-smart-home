@@ -43,9 +43,11 @@ const envSchema = z.object({
   CONFIRMATION_SECRET: optional(z.string().min(32)),
 
   // --- Network exposure ---
-  // Comma-separated hostnames (no ports) accepted in the Host / Origin headers of /mcp.
-  // Protects against DNS rebinding; set to your public hostname when deploying.
-  MCP_ALLOWED_HOSTS: withDefault(z.string(), "localhost,127.0.0.1,[::1]"),
+  // Comma-separated hostnames (no ports) accepted in the Host header of /mcp and /api.
+  // OPTIONAL: when unset or empty, every Host is accepted (the token is then the only gate).
+  // Set it to your public hostname(s) to also defend against DNS rebinding.
+  MCP_ALLOWED_HOSTS: optional(z.string()),
+  // Comma-separated origins allowed for browsers (CORS). Always an explicit allowlist, never "any".
   MCP_ALLOWED_ORIGINS: withDefault(z.string(), "localhost,127.0.0.1,[::1]"),
   // Reject plain-HTTP requests (except localhost). Defaults to on in production.
   REQUIRE_HTTPS: optional(bool),
@@ -119,6 +121,14 @@ export function tuyaConfigFrom(env: Env): TuyaConfig | undefined {
 /** Plain HTTP is refused outside localhost unless explicitly turned off. Default: on in production. */
 export function httpsRequired(env: Env): boolean {
   return env.REQUIRE_HTTPS ? env.REQUIRE_HTTPS === "true" : env.NODE_ENV === "production";
+}
+
+/**
+ * Hostnames accepted in the Host header. An EMPTY list means the check is off and any Host is accepted;
+ * the token remains the gate. Single source of truth for the pipeline and the startup warnings.
+ */
+export function allowedHosts(env: Pick<Env, "MCP_ALLOWED_HOSTS">): string[] {
+  return (env.MCP_ALLOWED_HOSTS ?? "").split(",").map((h) => h.trim()).filter(Boolean);
 }
 
 /** The database URL the running app should use: pooled when available. */

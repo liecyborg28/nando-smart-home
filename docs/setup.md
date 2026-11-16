@@ -120,5 +120,5 @@ Aktifkan hook pra-commit sekali: `git config core.hooksPath .githooks`.
 | Daftar device kosong | Akun Smart Life belum ditautkan ke project Tuya |
 | 401 | Token salah, sudah dicabut, atau kedaluwarsa. Jawabannya sengaja sama untuk semua sebab |
 | 503 pada semua request | Database tidak terjangkau; server sengaja menolak semuanya daripada menebak |
-| Host/origin ditolak (403) | Hostname belum ada di `MCP_ALLOWED_HOSTS` |
+| Host/origin ditolak (403) | `MCP_ALLOWED_HOSTS` diisi tetapi hostname-mu belum ada di dalamnya (kosongkan variabelnya bila tidak ingin membatasi), atau origin browser belum ada di `MCP_ALLOWED_ORIGINS` |
 | `npm test` gagal di semua file dengan `Cannot read properties of undefined (reading 'config')` (Windows) | Direktori kerja berhuruf kecil (`d:\...`), biasanya dari `cd /d/...` di Git Bash. Jalankan dari `D:\...` (huruf besar), misalnya lewat PowerShell |

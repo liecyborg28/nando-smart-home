@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { createLogger } from "@/lib/logger";
 import { UNTRUSTED_NOTICE } from "@/mcp/format";
 import { guarded } from "@/mcp/guard";
 import { SCOPES, TokenAuthenticator } from "@/security/authentication";
@@ -83,7 +84,29 @@ describe("authentication on /mcp", () => {
   it("fails closed when no database is configured at all", async () => {
     const auth = new TokenAuthenticator(new UnavailableTokenStore(), { cacheTtlMs: 0 });
     const res = await auth.authenticate(new Request("http://x/mcp", { headers: { authorization: `Bearer ${READ_KEY}` } }));
-    expect(res).toEqual({ ok: false, reason: "store_unavailable" });
+    expect(res).toMatchObject({ ok: false, reason: "store_unavailable" });
+  });
+
+  it("explains WHY the store failed with a safe cause (name and code), never the error message", async () => {
+    const leaky = Object.assign(new Error("connect failed: postgres://app:hunter2@db.internal.example/prod"), { code: "ECONNRESET" });
+    const store = { ...new UnavailableTokenStore(), findById: async () => Promise.reject(leaky) } as unknown as UnavailableTokenStore;
+    const auth = new TokenAuthenticator(store, { cacheTtlMs: 0 });
+    const res = await auth.authenticate(new Request("http://x/mcp", { headers: { authorization: `Bearer ${READ_KEY}` } }));
+    expect(res).toEqual({ ok: false, reason: "store_unavailable", cause: "Error:ECONNRESET" });
+    expect(JSON.stringify(res)).not.toMatch(/hunter2|postgres|db\.internal/);
+  });
+
+  it("logs the cause of a store outage for the operator, without leaking the message", async () => {
+    const lines: string[] = [];
+    h = createHarness();
+    h.deps.logger = createLogger({ level: "error", sink: (line: unknown) => void lines.push(typeof line === "string" ? line : JSON.stringify(line)) });
+    h.store.failing = true;
+    const res = await send({ authorization: `Bearer ${READ_KEY}` });
+    expect(res.status).toBe(503);
+    const joined = lines.join("\n");
+    expect(joined).toContain("token store unavailable");
+    expect(joined).toContain("Error"); // the cause field
+    expect(joined).not.toContain(READ_KEY);
   });
 
   it("does not let a store outage count as a failed-login attempt", async () => {
@@ -204,8 +227,8 @@ describe("token revocation and lifecycle", () => {
 });
 
 describe("Host / Origin protection (DNS rebinding)", () => {
-  it("rejects an unexpected Host header", async () => {
-    h = createHarness();
+  it("rejects an unexpected Host header when an allowlist is configured", async () => {
+    h = createHarness({ env: { MCP_ALLOWED_HOSTS: "localhost" } });
     const res = await send({ authorization: `Bearer ${READ_KEY}`, host: "evil.example.com" });
     expect(res.status).toBe(403);
   });

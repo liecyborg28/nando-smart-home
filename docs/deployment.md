@@ -27,7 +27,7 @@ Beda dengan server biasa:
 | Rate limit, anggaran biaya, cache token dan cache Tuya | Disimpan di memori **per instance**. Vercel bisa menjalankan banyak instance sekaligus, jadi batasnya **lebih longgar dari angka di `.env`**. Pencabutan token, nonce konfirmasi, dan audit tetap benar karena ada di Postgres. Untuk batas yang ketat lintas-instance perlu penyimpanan bersama (mis. Redis/Upstash), belum dibuat. |
 | Catatan audit | Ditulis ke Postgres dan platform diminta menunggu sampai selesai (`after()`), supaya tidak hilang saat fungsi dibekukan. |
 | Log | Retensi log Vercel terbatas. `audit_log` di Postgres adalah catatan permanen. |
-| Permintaan pertama setelah sepi | Lebih lambat (cold start fungsi, dan Neon yang tertidur). |
+| Permintaan pertama setelah sepi | Lebih lambat (cold start fungsi, dan Neon yang tertidur). Bila database belum siap, server menjawab **503** (sengaja menolak semuanya daripada menebak). Ulangi beberapa detik kemudian. Log mencatat penyebabnya sebagai `cause` (mis. `Error:ECONNRESET`), tanpa pesan error yang bisa memuat kredensial. |
 | Paket | Hobby hanya untuk pemakaian pribadi non-komersial (aturan Vercel). |
 
 ### Langkah
@@ -42,14 +42,14 @@ Beda dengan server biasa:
    | `TUYA_BASE_URL` | `https://openapi-sg.iotbing.com` |
    | `DATABASE_URL_POOLED` | URL pooled Neon. **Jangan** isi `DATABASE_URL` (koneksi langsung) di sini; hanya migrasi dan CLI yang memakainya, dan itu jalan dari komputermu. |
    | `CONFIRMATION_SECRET` | acak 32+ karakter |
-   | `MCP_ALLOWED_HOSTS` | hostname domainmu, mis. `home.contoh.com` (tanpa `https://`, tanpa port) |
-   | `MCP_ALLOWED_ORIGINS` | sama; tambahkan hostname dashboard bila ada |
+   | `MCP_ALLOWED_HOSTS` | **Opsional.** Kosong = semua Host boleh (token tetap satu-satunya penjaga). Diisi = hanya hostname itu, mis. `home.contoh.com,namaproject.vercel.app` (koma, tanpa `https://`, tanpa port). Disarankan diisi setelah domain final diketahui. |
+   | `MCP_ALLOWED_ORIGINS` | Hanya perlu bila ada dashboard di browser: isi hostname dashboard-nya. Tidak memengaruhi agent/curl |
    | `TRUSTED_PROXY_HOPS` | `1` |
    | `CONFIRM_ALL_WRITES` | `true` (disarankan untuk server publik) |
    | `WRITE_RATE_LIMIT_PER_MINUTE` | `10` |
 
    `NODE_ENV=production` diatur Vercel, dan itu otomatis mewajibkan HTTPS.
-4. **Domain**: tambahkan domainmu di Project > Settings > Domains, dan masukkan hostname-nya ke `MCP_ALLOWED_HOSTS`. Server menolak Host yang tidak ada di daftar; `*.vercel.app` hanya bisa dipakai bila hostname itu juga kamu tambahkan.
+4. **Domain**: bila memakai domain sendiri, tambahkan di Project > Settings > Domains. `MCP_ALLOWED_HOSTS` boleh dikosongkan agar semua Host diterima. Kalau kamu mengisinya, server menolak (403) Host yang tidak ada di daftar, jadi semua domain yang dipakai klien harus tercantum, termasuk `namaproject.vercel.app` bila dipakai. Perubahan variabel baru berlaku setelah Redeploy.
 5. **Deploy**, lalu buat token dari komputermu (database-nya sama):
 
    ```bash
@@ -94,7 +94,7 @@ Rancangannya:
 
 ```bash
 cp .env.example .env            # isi, termasuk DOMAIN=home.contoh.com
-                                # dan MCP_ALLOWED_HOSTS/MCP_ALLOWED_ORIGINS=home.contoh.com
+                                # (MCP_ALLOWED_HOSTS opsional; disarankan MCP_ALLOWED_HOSTS=home.contoh.com)
 docker compose run --rm tools db:migrate
 docker compose run --rm tools token -- create agno-baca --scope read
 docker compose up -d

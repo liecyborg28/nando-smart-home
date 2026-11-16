@@ -151,11 +151,11 @@ describe("network protections apply to REST like MCP", () => {
   });
 
   it("rejects a forged Host header", async () => {
-    expect((await createRestHarness().get("/api/devices", { headers: { host: "evil.example.com" } })).status).toBe(403);
+    expect((await createRestHarness({ env: { MCP_ALLOWED_HOSTS: "localhost" } }).get("/api/devices", { headers: { host: "evil.example.com" } })).status).toBe(403);
   });
 
   it("sends the security headers and a request id on every kind of response", async () => {
-    const h = createRestHarness({ ipRateLimit: 7 });
+    const h = createRestHarness({ ipRateLimit: 7, env: { MCP_ALLOWED_HOSTS: "localhost" } });
     const responses = [
       await h.get("/api/devices"),
       await h.get("/api/devices/nope"),
@@ -271,7 +271,7 @@ describe("CORS for browser dashboards", () => {
   });
 
   it("preflight is still subject to the per-IP limit and the host allowlist", async () => {
-    const h = createRestHarness({ ipRateLimit: 2, env: { MCP_ALLOWED_ORIGINS: "localhost,dash.example.com" } });
+    const h = createRestHarness({ ipRateLimit: 2, env: { MCP_ALLOWED_HOSTS: "localhost", MCP_ALLOWED_ORIGINS: "localhost,dash.example.com" } });
     expect((await preflight(h, "https://dash.example.com", "evil.example.com")).status).toBe(403);
     await preflight(h, "https://dash.example.com");
     expect((await preflight(h, "https://dash.example.com")).status).toBe(429);

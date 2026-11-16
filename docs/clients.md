@@ -25,7 +25,7 @@ The token is shown once. Give **each client its own token**: the name appears in
 | URL | `https://<your-domain>/mcp` (local: `http://localhost:3000/mcp`) |
 | Transport | Streamable HTTP only. There is no STDIO or SSE adapter. |
 | Header | `Authorization: Bearer nsh_<id>.<secret>` |
-| Public deployment | The hostname must be in `MCP_ALLOWED_HOSTS`; plain HTTP is refused. |
+| Public deployment | If the operator set `MCP_ALLOWED_HOSTS`, your hostname must be in it (it is optional; unset accepts any Host). Plain HTTP is refused. |
 
 ## 3. Clients and what is verified
 
@@ -66,7 +66,7 @@ The server works without skills. They make an agent ask before acting on vague r
 | Symptom | Likely cause |
 |---|---|
 | 401 on connect | Token wrong, revoked or expired. The answer is deliberately identical in every case. |
-| 403 on connect | Plain HTTP in production, or the Host/Origin is not in `MCP_ALLOWED_HOSTS` / `MCP_ALLOWED_ORIGINS`. |
+| 403 on connect | Plain HTTP in production, or (when configured) the Host is not in `MCP_ALLOWED_HOSTS`, or a browser Origin is not in `MCP_ALLOWED_ORIGINS`. |
 | 429 | A rate limit or the usage budget; wait for `Retry-After`. |
 | 503 | The token database is unreachable. The server refuses everything rather than guessing. |
 | Control tools missing | `CONTROL_ENABLED=false` on the server (emergency switch). |

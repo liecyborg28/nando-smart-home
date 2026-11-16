@@ -29,7 +29,19 @@ export type AuthFailure = "missing" | "malformed" | "unknown" | "invalid" | "rev
 export type AuthResult =
   | { ok: true; principal: Principal }
   | { ok: false; reason: AuthFailure }
-  | { ok: false; reason: "store_unavailable" };
+  | { ok: false; reason: "store_unavailable"; cause: string };
+
+/**
+ * A short, safe description of why the store failed, for the operator's log: only the error's name and
+ * code (e.g. "Error:ECONNRESET", "error:28P01"). Never the message, which can carry hosts or credentials.
+ */
+function safeCause(error: unknown): string {
+  if (typeof error !== "object" || error === null) return "unknown";
+  const { name, code } = error as { name?: unknown; code?: unknown };
+  const n = typeof name === "string" ? name.slice(0, 40) : "Error";
+  const c = typeof code === "string" || typeof code === "number" ? String(code).slice(0, 40) : "";
+  return c ? `${n}:${c}` : n;
+}
 
 export function extractBearerToken(request: Request): string | undefined {
   const match = /^Bearer\s+(\S+)\s*$/i.exec(request.headers.get("authorization") ?? "");
@@ -82,8 +94,8 @@ export class TokenAuthenticator {
     let record: TokenRecord | undefined;
     try {
       record = await this.lookup(parsed.id);
-    } catch {
-      return { ok: false, reason: "store_unavailable" };
+    } catch (error) {
+      return { ok: false, reason: "store_unavailable", cause: safeCause(error) };
     }
 
     const presented = hashSecret(parsed.secret);

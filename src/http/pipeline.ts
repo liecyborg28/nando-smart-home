@@ -1,5 +1,5 @@
 import { validateHostHeader, validateOriginHeader } from "@modelcontextprotocol/server";
-import { httpsRequired, type Env } from "@/config/env";
+import { allowedHosts, httpsRequired, type Env } from "@/config/env";
 import type { ErrorCode } from "@/core/errors";
 import type { Logger } from "@/lib/logger";
 import type { Principal, TokenAuthenticator } from "@/security/authentication";
@@ -92,7 +92,9 @@ export async function runPipeline(
     return secure(errorResponse(403, "AUTHORIZATION_FAILED", "HTTPS is required."));
   }
 
-  const hostOk = validateHostHeader(request.headers.get("host"), list(env.MCP_ALLOWED_HOSTS)).ok;
+  // No MCP_ALLOWED_HOSTS configured = host check disabled by the operator (any Host passes; the token is the gate).
+  const hosts = allowedHosts(env);
+  const hostOk = hosts.length === 0 || validateHostHeader(request.headers.get("host"), hosts).ok;
   const originOk = origin === null || originAllowed; // no Origin = not a browser, nothing to defend against here
   if (!hostOk || !originOk) {
     log.warn("request rejected by host/origin check");
@@ -108,7 +110,7 @@ export async function runPipeline(
   const auth = await deps.authenticator.authenticate(request);
   if (!auth.ok && auth.reason === "store_unavailable") {
     // Fail closed: if tokens cannot be verified, nothing is served.
-    log.error("token store unavailable; refusing request");
+    log.error("token store unavailable; refusing request", { cause: auth.cause });
     return secure(errorResponse(503, "PROVIDER_UNAVAILABLE", "Authentication is temporarily unavailable. Try again shortly.", { "Retry-After": "5" }));
   }
   if (!auth.ok) {

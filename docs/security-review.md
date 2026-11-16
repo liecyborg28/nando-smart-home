@@ -41,7 +41,8 @@ Ini tinjauan oleh pengembang yang sama dengan penulis kode, ditambah tes otomati
 | 10 | Belum ada halaman admin web | Token dikelola lewat CLI dari komputer yang memegang `DATABASE_URL` | Halaman admin butuh autentikasi, CSRF, dan sesi tersendiri; sengaja ditunda |
 | 11 | Deploy Vercel, image Docker, dan Caddy belum pernah dijalankan | Konfigurasi bisa salah di hari pertama | Daftar pengecekan setelah deploy di [deployment.md](deployment.md) |
 | 12 | IP klien di balik proxy Vercel belum terverifikasi | Bila `TRUSTED_PROXY_HOPS` tidak cocok, batas per IP memakai satu keranjang | Pengecekan nomor 2 di deployment.md |
-| 13 | Perilaku bahasa natural agent belum diuji dengan model sungguhan | Agent bisa memilih tool yang salah untuk kalimat tertentu | Skills diuji di rumah simulasi; uji dengan `run_agent.py` saat kamu punya `ANTHROPIC_API_KEY` |
+| 13 | `MCP_ALLOWED_HOSTS` dibiarkan kosong (keputusan pemilik: opsional) | Header Host tidak diperiksa, jadi perlindungan DNS rebinding hilang; token menjadi satu-satunya penjaga. Karena autentikasi memakai header `Authorization` (bukan cookie), halaman web jahat tidak bisa ikut mengirim token, sehingga risikonya kecil | Isi dengan hostname-mu bila domain sudah final. Pengecekan ini tidak membatasi IP penelepon |
+| 14 | Perilaku bahasa natural agent belum diuji dengan model sungguhan | Agent bisa memilih tool yang salah untuk kalimat tertentu | Skills diuji di rumah simulasi; uji dengan `run_agent.py` saat kamu punya `ANTHROPIC_API_KEY` |
 
 ## Yang sengaja tidak ada
 

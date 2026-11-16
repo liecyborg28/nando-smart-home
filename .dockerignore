@@ -1,0 +1,30 @@
+# Anything listed here can never end up in an image layer.
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Version control and tooling
+.git
+.githooks
+.github
+.vscode
+
+# Dependencies and build output are produced inside the image
+node_modules
+.next
+out
+coverage
+dist
+*.tsbuildinfo
+
+# Large or irrelevant to the runtime
+skills-workspace
+evals
+examples
+tests
+docs
+**/.venv
+**/__pycache__
+**/*.log

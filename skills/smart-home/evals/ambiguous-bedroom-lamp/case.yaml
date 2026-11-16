@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: ambiguous-bedroom-lamp
+expected_outcome: |
+  Two lamps match "lampu kamar": Lampu Kamar Utama and Lampu Kamar Anak. The agent must not guess.
+  It sends nothing, names both candidates, and asks which one (or both) the user means. It must not touch Lampu Ruang Tamu.

@@ -1,0 +1,14 @@
+# Automatic HTTPS (Let's Encrypt) for $DOMAIN. Ports 80 and 443 must reach this machine.
+{$DOMAIN} {
+	encode zstd gzip
+
+	# The app refuses bodies over 64 KiB; refuse them here first so they never reach it.
+	request_body {
+		max_size 128KB
+	}
+
+	# Streamable HTTP can stream: do not buffer responses.
+	reverse_proxy app:3000 {
+		flush_interval -1
+	}
+}

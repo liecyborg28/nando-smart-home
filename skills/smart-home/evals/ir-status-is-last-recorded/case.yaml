@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: ir-status-is-last-recorded
+expected_outcome: |
+  The agent reads the AC's status: recorded as on, 24 degrees. Because the AC is infrared, that is only what the cloud last recorded, not live feedback.
+  The answer gives the recorded values but does not present them as the AC's confirmed current state (it says "terakhir tercatat" or similar). It only reads; it sends nothing.

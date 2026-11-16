@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: all-devices-status-efficient
+expected_outcome: |
+  The user wants the status of all seven devices. Each call costs provider quota and is rate limited, so the agent should use one batch call (or the overview) instead of one call per device.
+  It only reads, and reports every device, noting that the IR AC's values are last recorded.

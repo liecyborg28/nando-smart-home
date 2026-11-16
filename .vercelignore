@@ -1,0 +1,7 @@
+# Never upload secrets or local-only material when deploying with the Vercel CLI.
+.env
+.env.*
+!.env.example
+skills-workspace
+examples/agno/.venv
+.git

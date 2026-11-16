@@ -1,0 +1,19 @@
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets: never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Python example environments
+.venv/
+__pycache__/
+
+# Evaluation transcripts and results
+skills-workspace/

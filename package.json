@@ -2,6 +2,7 @@
   "name": "nando-smart-home",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "Provider-independent smart home integration service exposing MCP, REST and Agent Skills.",
   "engines": {

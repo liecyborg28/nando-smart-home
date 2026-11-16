@@ -77,3 +77,7 @@ db/         SQL migrations
 scripts/    token CLI, migrations, secret scanner
 tests/      unit, integration, security, contract, deploy, live (opt-in)
 ```
+
+## License
+
+[MIT](LICENSE). Use it, change it, share it; there is no warranty. This software can control physical devices in your home, so read [docs/security.md](docs/security.md) and [docs/security-review.md](docs/security-review.md) before exposing it to the internet.

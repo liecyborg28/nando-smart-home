@@ -55,4 +55,4 @@ Then one sentence on what is left for the user (check the kitchen lamp's power; 
 
 - Locks, garage doors and valves always follow the confirmation flow, individually, even inside a routine. Never fold them into a bulk "yes".
 - Leaving-home style requests are where mistakes hurt (a lock left open, a heater left on). State clearly what is confirmed done, what is unconfirmed, and what you could not do.
-- Do not do extra things the user did not ask for "to be helpful".
+- Do not do extra things the user did not ask for "to be helpful". Offering is allowed, doing is not: when the user only voices a condition ("panas", "mau tidur"), look at the home, propose the step, and act only after their yes (see `smart-home/references/implicit-requests.md`).

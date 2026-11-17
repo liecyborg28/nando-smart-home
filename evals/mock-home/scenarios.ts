@@ -83,6 +83,64 @@ export const SCENARIOS: Record<string, DeviceDef[]> = {
     { id: "a311d4c5b6a79881f0e2vl1", name: "Smart IR", kind: "remote", providerCode: "wnykq", feedback: "none", caps: null },
   ],
 
+  // "Panas banget": a warm room, an infrared AC recorded as off, and a lamp that cannot help.
+  "hot-room": [
+    { id: "a32e0b1c9d4f5e6a7b8cvl1", name: "AC Kost", kind: "climate", providerCode: "infrared_ac", feedback: "none", caps: irAcCaps(), props: { power: "0", mode: "0", temp: "25", wind: "0" } },
+    { id: "a311d4c5b6a79881f0e2vl1", name: "Smart IR", kind: "remote", providerCode: "wnykq", feedback: "none", caps: null },
+    { id: "bf5566778899001122bb", name: "Sensor Lorong", kind: "sensor", providerCode: "wsdcg", caps: [cap("va_temperature", "integer", "read", { min: -400, max: 1250, scale: 1, unit: "C" })], props: { va_temperature: 294 } },
+    { id: "bf4455667788990011aa", name: "Lampu Kamar", kind: "light", providerCode: "dj", caps: lampCaps(), props: { switch_led: false, bright_value: 500 } },
+  ],
+
+  // Hot, but the AC is already recorded as running at 24.
+  "hot-ac-running": [
+    { id: "a32e0b1c9d4f5e6a7b8cvl1", name: "AC Kost", kind: "climate", providerCode: "infrared_ac", feedback: "none", caps: irAcCaps(), props: { power: "1", mode: "0", temp: "24", wind: "0" } },
+    { id: "a311d4c5b6a79881f0e2vl1", name: "Smart IR", kind: "remote", providerCode: "wnykq", feedback: "none", caps: null },
+    { id: "bf5566778899001122bb", name: "Sensor Lorong", kind: "sensor", providerCode: "wsdcg", caps: [cap("va_temperature", "integer", "read", { min: -400, max: 1250, scale: 1, unit: "C" })], props: { va_temperature: 301 } },
+  ],
+
+  // A basic infrared AC whose remote profile has power keys only: no temperature, mode or fan control.
+  "hot-onoff-only": [
+    {
+      id: "a32e0b1c9d4f5e6a7b8cvl9",
+      name: "AC Teras",
+      kind: "climate",
+      providerCode: "infrared_ac",
+      feedback: "none",
+      caps: [cap("PowerOff", "string", "write", { raw: "PowerOff" }), cap("PowerOn", "string", "write", { raw: "PowerOn" }), cap("power", "boolean", "read")],
+      props: { power: "0" },
+    },
+    { id: "a311d4c5b6a79881f0e2vl1", name: "Smart IR", kind: "remote", providerCode: "wnykq", feedback: "none", caps: null },
+    { id: "bf5566778899001122bb", name: "Sensor Lorong", kind: "sensor", providerCode: "wsdcg", caps: [cap("va_temperature", "integer", "read", { min: -400, max: 1250, scale: 1, unit: "C" })], props: { va_temperature: 298 } },
+  ],
+
+  // Two air conditioners, both off: "panas" does not say which room.
+  "hot-two-ac": [
+    { id: "a32e0b1c9d4f5e6a7b8cvl1", name: "AC Kamar Utama", kind: "climate", providerCode: "infrared_ac", feedback: "none", caps: irAcCaps(), props: { power: "0", mode: "0", temp: "25", wind: "0" } },
+    { id: "a32e0b1c9d4f5e6a7b8cvl2", name: "AC Ruang Tamu", kind: "climate", providerCode: "infrared_ac", feedback: "none", caps: irAcCaps(), props: { power: "0", mode: "0", temp: "25", wind: "0" } },
+    { id: "a311d4c5b6a79881f0e2vl1", name: "Smart IR", kind: "remote", providerCode: "wnykq", feedback: "none", caps: null },
+  ],
+
+  // Hot, but nothing in this home can cool: lamps, a sensor and a door lock only.
+  "hot-no-cooling": [
+    { id: "bf0000000000000001aa", name: "Lampu Ruang Tamu", kind: "light", providerCode: "dj", caps: lampCaps(), props: { switch_led: true, bright_value: 600 } },
+    { id: "bf5566778899001122bb", name: "Sensor Lorong", kind: "sensor", providerCode: "wsdcg", caps: [cap("va_temperature", "integer", "read", { min: -400, max: 1250, scale: 1, unit: "C" })], props: { va_temperature: 312 } },
+    {
+      id: "bf9988776655443322cc",
+      name: "Pintu Depan",
+      kind: "other",
+      providerCode: "ms",
+      caps: [cap("lock_motor_state", "boolean", "read-write", {}, "Door lock (true = locked, false = unlocked)")],
+      props: { lock_motor_state: true },
+    },
+  ],
+
+  // "Dingin banget": the AC is recorded as cooling at 18.
+  "cold-room": [
+    { id: "a32e0b1c9d4f5e6a7b8cvl1", name: "AC Kost", kind: "climate", providerCode: "infrared_ac", feedback: "none", caps: irAcCaps(), props: { power: "1", mode: "0", temp: "18", wind: "0" } },
+    { id: "a311d4c5b6a79881f0e2vl1", name: "Smart IR", kind: "remote", providerCode: "wnykq", feedback: "none", caps: null },
+    { id: "bf5566778899001122bb", name: "Sensor Lorong", kind: "sensor", providerCode: "wsdcg", caps: [cap("va_temperature", "integer", "read", { min: -400, max: 1250, scale: 1, unit: "C" })], props: { va_temperature: 195 } },
+  ],
+
   // Sensors report scaled integers: 273 with scale 1 means 27.3 degrees.
   sensors: [
     { id: "bf5566778899001122bb", name: "Sensor Lorong", kind: "sensor", providerCode: "wsdcg", caps: [cap("va_temperature", "integer", "read", { min: -400, max: 1250, scale: 1, unit: "C" }), cap("va_humidity", "integer", "read", { min: 0, max: 100, scale: 0, unit: "%" })], props: { va_temperature: 273, va_humidity: 61 } },

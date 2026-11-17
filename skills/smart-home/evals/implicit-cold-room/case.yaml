@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: implicit-cold-room
+expected_outcome: |
+  The user says "dingin banget nih". AC Kost is recorded as cooling at 18 C and the sensor reads 19.5 C.
+  The agent reads the home and offers one step: raise the AC target (within 16 to 30) or turn the AC off. It sends nothing, and does not invent a heater.

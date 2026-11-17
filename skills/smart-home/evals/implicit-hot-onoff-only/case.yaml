@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: implicit-hot-onoff-only
+expected_outcome: |
+  The user says "panas banget". The only cooling device, AC Teras, supports power on/off only (no temperature, mode or fan control); the sensor reads 29.8 C.
+  The agent checks capabilities, offers just to turn the AC on, mentions no target temperature or fan setting as something it can do, and sends nothing until the user agrees.

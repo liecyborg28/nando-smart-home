@@ -4,11 +4,15 @@ Three portable skills teach an agent how to use the Nando Smart Home MCP tools w
 
 | Skill | Use it for |
 |---|---|
-| `skills/smart-home` | The main skill: find the device, inspect capabilities, read or control, handle the two-step confirmation, report results honestly. Has `references/` for device types, control rules and error codes, and safety rules. |
+| `skills/smart-home` | The main skill: find the device, inspect capabilities, read or control, handle the two-step confirmation, report results honestly. Has `references/` for device types, control rules and error codes, implicit requests, and safety rules. |
 | `skills/device-management` | Read-only work: what devices exist, what they can do, their status, which one the user means, why something does not respond. |
 | `skills/home-automation` | Several devices or several steps: scope, planning, partial failures, per-device reporting. |
 
 Each `SKILL.md` has YAML frontmatter (`name`, `description`) and keeps its body short; detail lives in `references/` and is read only when needed (progressive disclosure). Validate with the skill-creator `quick_validate.py`.
+
+## Implicit requests ("panas banget")
+
+A user often voices a condition instead of a command. The skill treats that as a reason to **look and offer, not to act**: the agent reads the home on its own (devices, sensor), proposes one concrete step with real values ("Suhu 29,4 C, AC Kost terakhir tercatat mati. Mau saya nyalakan dan set ke 24 C?"), and changes nothing until the user says yes. It does not offer a device that is already doing the job, asks when two devices fit, says so when nothing can help, and never offers locks or other high-impact devices from a complaint. Rules and edge cases: `skills/smart-home/references/implicit-requests.md`. Whether a client loads the skill from such a vague sentence depends on the client; test it with your own agent.
 
 ## Loading
 

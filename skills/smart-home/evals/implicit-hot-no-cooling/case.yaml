@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: implicit-hot-no-cooling
+expected_outcome: |
+  The user says "panas banget". The home has a lamp, a temperature sensor (31.2 C) and a door lock, but nothing that can cool.
+  The agent reads the home, says plainly that it found no device that can cool the room, may report the 31.2 C reading, sends nothing, and does not offer the lamp or the lock.

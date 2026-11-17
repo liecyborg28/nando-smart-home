@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: implicit-hot-two-ac
+expected_outcome: |
+  The user says "panas banget". There are two air conditioners (AC Kamar Utama, AC Ruang Tamu), both off. The agent cannot know which room is meant.
+  It sends nothing, names both, and asks which one (or both) to turn on.

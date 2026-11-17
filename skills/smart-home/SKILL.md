@@ -1,6 +1,6 @@
 ---
 name: smart-home
-description: Operate the user's smart home through the Nando Smart Home MCP tools (list_devices, get_device_status, get_device_capabilities, turn_on_device, turn_off_device, set_device_property, execute_device_command and friends). Use this whenever the user talks about devices in their home - AC, lamps and lights, sockets, door locks, sensors, curtains, "nyalakan", "matikan", "cek", "atur suhu", "buka kunci", "device apa saja", status or temperature at home, Smart Life or Tuya - even if they never name a tool. It teaches how to find the right device, inspect what it supports before acting, handle the two-step confirmation for sensitive actions, and report results honestly (a command being sent is not proof the device obeyed).
+description: Operate the user's smart home through the Nando Smart Home MCP tools (list_devices, get_device_status, get_device_capabilities, turn_on_device, turn_off_device, set_device_property, execute_device_command and friends). Use this whenever the user talks about devices in their home - AC, lamps and lights, sockets, door locks, sensors, curtains, "nyalakan", "matikan", "cek", "atur suhu", "buka kunci", "device apa saja", status or temperature at home, Smart Life or Tuya - even if they never name a tool. Also use it when the user only voices a feeling or condition that a home device could fix, without giving a command - "panas banget", "gerah", "dingin nih", "gelap", "silau", "kok pengap", "it's freezing", "too bright in here" - because the right response is to look at the home and offer a fix, not to ignore it. It teaches how to find the right device, inspect what it supports before acting, handle the two-step confirmation for sensitive actions, and report results honestly (a command being sent is not proof the device obeyed).
 ---
 
 # Smart home assistant
@@ -29,6 +29,16 @@ If a control tool is missing or returns `AUTHORIZATION_FAILED`, the connection i
 6. **Verify and report.** Read `verification.result` in the response and report accordingly (see below).
 7. **Handle errors by code**, in `references/device-control.md`. Do not retry blindly; some errors are final (unsupported, not found) and some mean "wait and try again" (rate limited, provider unavailable).
 
+## When the user only complains
+
+"Panas banget", "gelap nih", "dingin ya": the user is describing a condition, not giving an order, yet usually hopes the home will help. Handle it in three beats:
+
+1. **Look on your own.** Reading is always safe: `list_devices`, then work out which devices of *any* kind could change the condition (an AC or fan for heat, a lamp or curtain for darkness, a humidifier for dry air...) and read a sensor if one exists. This is general reasoning over the real inventory, not a fixed list. Do not ask permission to look.
+2. **Offer exactly one concrete step**, sized to what the device supports (check `get_device_capabilities`: a device that only turns on and off gets an on/off offer, never a temperature or speed), with the real values: "Suhu 29,4 C, AC Kost terakhir tercatat mati. Mau saya nyalakan dan set ke 24 C?"
+3. **Stop and wait.** Send no control call until the user says yes. A feeling is not consent to change the real world, and your guess (which room, which device, what temperature) can be wrong.
+
+If a device is already doing the job, do not offer it again; if nothing can help, say so; never offer locks or other high-impact devices from a complaint. Details and edge cases: `references/implicit-requests.md`. Read it the first time a user voices a condition instead of a command.
+
 ## Reporting results honestly
 
 `accepted: true` only means the cloud received the command, not that the device did anything.
@@ -54,6 +64,7 @@ Reveal tokens, keys, URLs of backends or any credential. Claim a command succeed
 
 - `references/device-types.md` - what each category means, infrared devices, how to read AC values. Read it when you meet an unfamiliar device or an air conditioner or remote.
 - `references/device-control.md` - tool arguments, value rules, the confirmation flow in detail, every error code and what to do. Read it before your first control action in a conversation.
+- `references/implicit-requests.md` - what to do when the user voices a feeling instead of a command ("panas", "gelap"): look, offer one step, wait for yes. Read it when the message has no explicit action.
 - `references/safety-rules.md` - the full rule list. Read it when a request feels risky or ambiguous (locks, many devices at once, anything irreversible).
 
 For listing, inspecting and explaining devices in depth, use the `device-management` skill; for multi-device or multi-step requests ("goodnight mode", "turn off every light"), use `home-automation`.

@@ -11,5 +11,6 @@ Run one scenario by hand:
 
 Scenario per case: ir-ac-honest-report -> ir-ac, door-lock-needs-confirmation -> door-lock,
 injected-device-name -> injected-name, all-lights-partial-failure -> lights-mixed.
+Implicit requests (a complaint, no command): implicit-hot-offers-ac and implicit-hot-confirmed-yes -> hot-room, implicit-hot-ac-already-running -> hot-ac-running, implicit-hot-two-ac -> hot-two-ac, implicit-hot-no-cooling -> hot-no-cooling, implicit-cold-room -> cold-room, implicit-hot-onoff-only -> hot-onoff-only.
 
 `claude plugin eval` cannot run these (it has no access to the simulator); use the skill-creator workflow instead.

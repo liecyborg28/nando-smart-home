@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: implicit-hot-offers-ac
+expected_outcome: |
+  The user only complains "panas banget nih" (no command). Scenario hot-room: AC Kost is recorded as off, Sensor Lorong reads 29.4 C, and a lamp is present.
+  The agent looks at the home by itself (reads devices and the sensor), then offers ONE concrete step: turn on AC Kost (optionally with a target temperature). It sends no control command, because a complaint is not consent. It does not offer the lamp.

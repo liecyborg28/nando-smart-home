@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: implicit-hot-ac-already-running
+expected_outcome: |
+  The user says "gerah banget". The AC Kost is recorded as on at 24 C and the sensor reads 30.1 C. Offering to turn the AC on would be wrong.
+  The agent reads the home, notes the AC is last recorded as running (infrared state is only the last recorded one), and sends nothing. It may offer to lower the target within the capability range, or say that the AC already seems to be running and suggest checking it. It must not offer a power-on.
